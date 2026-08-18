@@ -16,18 +16,28 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '17'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.x'
+          flutter-version: '3.22.2'
           channel: 'stable'
 
-      - name: Lengkapi Berkas Sistem Android Otomatis
+      - name: Buat Struktur Android Lengkap Otomatis
         run: |
-          flutter create . --platforms=android --org=com.amg.prototipe
+          rm -rf android
+          flutter create . --platforms=android --org=com.amg.prototipe --project-name=amg_prototipe
+          find android -name "build.gradle*" -exec sed -i 's/minSdkVersion = flutter.minSdkVersion/minSdkVersion = 21/g' {} +
+          find android -name "build.gradle*" -exec sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 21/g' {} +
+          find android -name "build.gradle*" -exec sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/g' {} +
+          find android -name "build.gradle*" -exec sed -i 's/minSdk flutter.minSdkVersion/minSdk 21/g' {} +
+
+          MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST_FILE" ]; then
+            sed -i '/<application/i \    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <uses-permission android:name="android.permission.CAMERA"/>' $MANIFEST_FILE
+          fi
 
       - name: Install Dependencies
         run: flutter pub get
