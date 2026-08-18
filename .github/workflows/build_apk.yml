@@ -25,11 +25,15 @@ jobs:
           flutter-version: '3.22.x'
           channel: 'stable'
 
+      - name: Lengkapi Berkas Sistem Android Otomatis
+        run: |
+          flutter create . --platforms=android --org=com.amg.prototipe
+
       - name: Install Dependencies
         run: flutter pub get
 
       - name: Build APK Release
-        run: flutter build apk --release
+        run: flutter build apk --release --no-tree-shake-icons
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
